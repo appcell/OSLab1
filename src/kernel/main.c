@@ -10,6 +10,8 @@ os_init(void) {
 	init_idt();
 	init_i8259();
 	printk("The OS is now working!\n");
+	vfprintf("This is a common string.\n");
+	vfprintk("This is a string with an integer num: %d.\n",3);
 	sti();
 	while (TRUE) {
 		wait_intr();
