@@ -12,7 +12,7 @@
 int
 vfprintf(void (*putchar_func)(char), const char *format, void **data) {
 	const char *s;
-	for (s = "please implement me\n"; *s; s ++) {
+	for (s = format; *s; s ++) {
 		putchar_func(*s);
 	}
 	return 0;
