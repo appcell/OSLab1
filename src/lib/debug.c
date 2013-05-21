@@ -26,13 +26,13 @@ serial_printc(char ch) {
 	out_byte(SERIAL_PORT, ch);
 }
 
-int vfprintf(void (*)(char), const char *, void **);
+int vfprintf(void (*)(char), const char *, va_list ap);
 
 int
 printk(const char *fmt, ...) {
 	int n;
 	va_list ap;
-	va_start(ap);
+	va_start(ap,fmt);
 	n=vfprintf(serial_printc, fmt, ap);
 	//void **args = (void **)&fmt + 1;
 	va_end(ap);
