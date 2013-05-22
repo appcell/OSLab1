@@ -5,6 +5,7 @@
 
 void
 os_init(void) {
+	char aaa='A';
 	init_seg();
 	init_debug();
 	init_idt();
@@ -13,8 +14,10 @@ os_init(void) {
 	printk("This is a common string.\n");
 	printk("This is a string with an integer num: %d.\n",3);
 printk("This is a string with an x num valued 335: %x.\n",335);
+printk("This is a string with two nums: %d and %x.\n",3,334);
 printk("This is a string with a string: %s.\n","hello world");
-printk("This is a string with a char: %c.\n",'A');
+printk("This is a string with a char: %c.\n",aaa);
+printk("This is a string with a %");
 	sti();
 	while (TRUE) {
 		wait_intr();

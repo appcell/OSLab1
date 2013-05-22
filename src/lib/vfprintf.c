@@ -30,7 +30,13 @@ vfprintf(void (*putchar_func)(char), const char *format, va_list ap) {
 						cnt += vfprintf(putchar_func,va_arg(ap,char *),(va_list)NULL);
 						break;
 				case('c'):
-						cnt += vfprintf(putchar_func,va_arg(ap,char),(va_list)NULL);
+						putchar_func(va_arg(ap,char));
+						cnt ++;
+						break;
+				case(0):
+						s--;
+						putchar_func(*s);
+						cnt++;
 						break;
 				default:
 						putchar_func(*s);
