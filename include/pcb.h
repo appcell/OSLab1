@@ -6,20 +6,18 @@
 #include "x86.h"
 
 #define KSTACK_SIZE 128
+#define MAX_PROCESS_NUM 64
 struct PCB {
 	TrapFrame *tf;
 	uint8_t kstack[KSTACK_SIZE];
 	int lock;
-};
-typedef struct PCB PCB;
-struct PCBListNode {
-	PCB pcb;
 	ListHead list;
 };
-typedef struct PCBListNode PCBListNode;
+typedef struct PCB PCB;
 
-extern ListHead RunQueue;
-extern ListHead FreeQueue;
+
+extern ListHead RunQP;
+extern ListHead FreeQP;
 
 PCB *create_kthread(void *entry);
 void sleep(void);
@@ -29,7 +27,7 @@ void unlock(void);
 
 
 void init_proc(void);
-void prcswitch(void);
+void prcswitch(void);	//switch process to the next one in run Q
 void remove(ListHead *list);
 void test_producer(void);
 void test_consumer(void);
