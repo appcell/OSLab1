@@ -2,10 +2,14 @@
 #include "x86.h"
 #include "vm.h"
 #include "irq.h"
+#include "pcb.h"
+
+PCBListNode PCBHead;
 
 void
 os_init(void) {
 	char aaa='A';
+	
 	init_seg();
 	init_debug();
 	init_idt();

@@ -1,12 +1,21 @@
 #include "x86.h"
 #include "kernel.h"
+#include "adt/list.h"
+#include "pcb.h"
 
 void irq_handle(TrapFrame *tf) {
+
 	int irq = tf->irq;
+	current->tf = tf;
+	printk("%d\n",irq);
 	assert(irq >= 0);
 
 	if (irq < 1000) {
 		// exception
+		if(irq == 0x80)
+		{
+			prcswitch();
+		}
 		cli();
 		printk("Unexpected exception #%d\n", irq);
 		printk(" errorcode %x\n", tf->err);
