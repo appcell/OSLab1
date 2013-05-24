@@ -50,12 +50,12 @@ void wakeup(PCB *pcb)
 
 void lock(void)
 {
-		cli();
+	cli();
 }
 
 void unlock(void)
 {
-		sti();
+	sti();
 }
 
 void remove(ListHead *list)
@@ -70,15 +70,3 @@ void prcswitch(void)
 		current = list_entry(&RunQP, PCB, tf);
 }
 
-void lock(void)
-{
-	cli();
-	current->lock ++;
-}
-
-void unlock(void)
-{
-	current->lock --;
-	if(current->lock == 0)
-		sti();
-}
