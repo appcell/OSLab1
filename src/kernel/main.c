@@ -4,7 +4,6 @@
 #include "irq.h"
 #include "pcb.h"
 
-PCBListNode PCBHead;
 
 void
 os_init(void) {

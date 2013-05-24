@@ -1,12 +1,16 @@
 #include "pcb.h"
 #include "debug.h"
 
+
+PCB *current=NULL;
+ListHead RunQP;
+ListHead FreeQP;	
 PCB PCBStack[MAX_PROCESS_NUM];
 int PCBStackTail = 0;
 PCB *create_kthread(void *entry)
 {
 	PCB *pcb;
-	pcb = &PCBStack[PSBStackTail];
+	pcb = &PCBStack[PCBStackTail];
 
 	/* Initialize the trap frame */
 	TrapFrame * tf = ((TrapFrame *)(pcb->kstack + KSTACK_SIZE)) - 1;
@@ -26,14 +30,45 @@ PCB *create_kthread(void *entry)
 }
 void sleep(void)
 {
+	list_add_before(&FreeQP,&current->freeq);
+	list_del(&current->runq);
 	asm volatile("int $0x80");
 }
+void wakeup(PCB *pcb)
+{
+	ListHead * temp = &FreeQP;
+	list_foreach(temp,&FreeQP)
+	{
+		if(list_entry(temp,PCB,freeq)==pcb)
+		{
+			remove(list_entry(temp,PCB,freeq));
+			list_add_before(&RunQP,list_entry(temp,PCB,runq));
+		}
+	}
 
+}
 
+void remove(ListHead *list)
+{
+	list_del(list);
+}
 void prcswitch(void)
 {
-	if (current == list_entry(RunQP.prev, PCB, tf) );
+	if (current == list_entry(RunQP.prev, PCB, tf) )
 		current = list_entry(RunQP.next, PCB, tf);
 	else
-		current = list_entry(RunQP, PCB, tf);
+		current = list_entry(&RunQP, PCB, tf);
+}
+
+void lock(void)
+{
+	cli();
+	current->lock ++;
+}
+
+void unlock(void)
+{
+	current->lock --;
+	if(current->lock == 0)
+		sti();
 }
