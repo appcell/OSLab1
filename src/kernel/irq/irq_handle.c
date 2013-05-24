@@ -7,14 +7,13 @@ void irq_handle(TrapFrame *tf) {
 
 	int irq = tf->irq;
 	current->tf = tf;
-	printk("%d\n",irq);
 	assert(irq >= 0);
-
+	if (irq < 0) return; // !!!!
 	if (irq < 1000) {
 		// exception
-		if(irq == 0x80)
+		if(irq == 0x80)		// soft interrupt
 		{
-			prcswitch();
+			current = temp; prcswitch(); return;
 		}
 		cli();
 		printk("Unexpected exception #%d\n", irq);
@@ -23,6 +22,7 @@ void irq_handle(TrapFrame *tf) {
 		panic("unexpected exception");
 	} else if (irq >= 1000) {
 		// external interrupt
+		prcswitch();
 	}
 }
 
