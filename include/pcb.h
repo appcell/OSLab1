@@ -11,7 +11,7 @@
 #define MAX_PROCESS_NUM 64
 struct PCB {
 	TrapFrame *tf;
-	uint8_t kstack[KSTACK_SIZE];
+	uint32_t kstack[KSTACK_SIZE];
 	ListHead runq, freeq;
 
 	int lock_count;

@@ -8,7 +8,7 @@ void irq_handle(TrapFrame *tf) {
 	int irq = tf->irq;
 	current->tf = tf;
 	assert(irq >= 0);
-	if (irq < 0) return; // !!!!
+
 	if (irq < 1000) {
 		// exception
 		if(irq == 0x80)		// soft interrupt
