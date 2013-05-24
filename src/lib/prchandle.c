@@ -1,9 +1,7 @@
 #include "pcb.h"
 #include "debug.h"
 #include "semaphore.h"
-#define NBUF 5
-int buf[NBUF], f = 0, r = 0, g = 1, tid = 1;
-Semaphore empty, full, mutex;
+
 
 
 PCB * current = NULL;
@@ -37,43 +35,31 @@ PCB *create_kthread(void *entry)
 
 }
 
-/*void sleep(void)	// !!!!!!
+void sleep(void)
 {
 	temp=list_entry(current->runq.prev,PCB, runq);
 	list_add_before(&FreeQP,&current->freeq);
 	list_del(&current->runq);
-	asm volatile("int $0x80");
+
+	asm volatile("int $0x80");	// insert a software interruption
 }
 
 void wakeup(PCB *pcb)
 {
-	ListHead * wake_temp = &FreeQP;
+	ListHead *wake_temp;
+	PCB *pcb_temp;
 	list_foreach(wake_temp,&FreeQP)
 	{
 		if(list_entry(wake_temp,PCB,freeq) == pcb)
 		{
-			remove(list_entry(wake_temp,PCB,freeq));
-			list_add_before(&RunQP,list_entry(wake_temp,PCB,runq));
+			pcb_temp = list_entry(wake_temp,PCB,freeq); 
+			list_del(&pcb_temp->freeq);
+			list_add_before(&RunQP,&pcb_temp->runq);
 		}
 	}
 
-}*/
+}
 
-void sleep(void){
-	temp=list_entry(current->runq.prev,PCB, runq);
-	remove(&current->runq);
-	list_add_before(&FreeQP,&current->freeq);
-	asm volatile("int $0x80");
-}
-void wakeup(PCB *pcb){
-	PCB *pcb_1=list_entry(FreeQP.next,PCB, freeq);
-	for(;pcb_1!=list_entry(&FreeQP, PCB, freeq);pcb_1=list_entry(pcb_1->freeq.next,PCB, freeq))	{
-		if(pcb_1==pcb){
-			remove(&pcb_1->freeq);
-			list_add_before(&RunQP,&pcb_1->runq);
-		}
-	}
-}
 
 void lock(void)
 {
@@ -89,14 +75,6 @@ void unlock(void)
 	if (current->lock_count == 0) sti();
 }
 
-void remove(ListHead *list)
-{
-	lock();
-	//list_del(list);	//!!!!
-	list->prev->next = list->next;
-	list->next->prev = list->prev;
-	unlock();
-}
 void prcswitch(void)
 {
 	if (current == list_entry(RunQP.prev, PCB, runq) )
@@ -105,17 +83,15 @@ void prcswitch(void)
 		current = list_entry(current->runq.next, PCB, runq);
 }
 
-void A(void) { while (1) {printk("A"); wait_intr();} }
-void B(void) { while (1) {printk("B"); wait_intr();} }
 
-void init_proc(){	
-	current=list_entry(&RunQP,PCB,runq);
-
+void init_all()
+{
+	int i,j;
 	list_init(&RunQP);
 	list_init(&FreeQP);
-
+	current=list_entry(&RunQP,PCB,runq);
 	PCBStackTail=0;
-	int i,j;
+	
 	for (i = 0; i < MAX_PROCESS_NUM; i++)
 	{
 		PCBStack[i].tf = NULL;
@@ -126,42 +102,4 @@ void init_proc(){
 	test_setup();
 }
 
-void
-test_producer(void) {
-    while (TRUE) {
-        P(&empty);
-        P(&mutex);
-        buf[f ++] = g ++;
-        f %= NBUF;
-        V(&mutex);
-        V(&full);
-    }
-}
-
-void
-test_consumer(void) {
-    int id = tid ++;
-    while (TRUE) {
-        P(&full);INTR;
-        P(&mutex);INTR;
-        printk("#%d Got: %d\n", id, buf[r ++]);INTR;
-        r %= NBUF;
-        V(&mutex);INTR;
-        V(&empty);INTR;
-    }
-}
-
-void
-test_setup(void) {
-    new_sem(&full, 0);
-    new_sem(&empty, NBUF);
-    new_sem(&mutex, 1);
-    wakeup(create_kthread(test_producer));
-    wakeup(create_kthread(test_producer));
-    wakeup(create_kthread(test_producer));
-    wakeup(create_kthread(test_consumer));
-    wakeup(create_kthread(test_consumer));
-    wakeup(create_kthread(test_consumer));
-    wakeup(create_kthread(test_consumer));
-}
 

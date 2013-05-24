@@ -22,7 +22,7 @@ typedef struct PCB PCB;
 extern PCB *current;
 extern PCB PCBStack[];
 extern int PCBStackTail;
-extern PCB *temp;	//???
+extern PCB *temp;
 
 extern ListHead RunQP;
 extern ListHead FreeQP;
@@ -33,9 +33,8 @@ void wakeup(PCB *pcb);
 void lock(void);
 void unlock(void);
 
-void init_proc(void);	//initialize the processes
+void init_all(void);	//initialize
 void prcswitch(void);	//switch process to the next one in run Q
-void remove(ListHead *list);	//remove a list node
 void test_producer(void);
 void test_consumer(void);
 void test_setup(void);
