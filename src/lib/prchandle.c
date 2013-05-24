@@ -48,6 +48,16 @@ void wakeup(PCB *pcb)
 
 }
 
+void lock(void)
+{
+		cli();
+}
+
+void unlock(void)
+{
+		sti();
+}
+
 void remove(ListHead *list)
 {
 	list_del(list);

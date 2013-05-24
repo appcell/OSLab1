@@ -16,7 +16,7 @@ struct PCB {
 };
 typedef struct PCB PCB;
 
-extern PCB *current;	//current PCB
+extern PCB *current;
 extern PCB PCBStack[MAX_PROCESS_NUM];
 extern int PCBStackTail;
 extern PCB *temp;
